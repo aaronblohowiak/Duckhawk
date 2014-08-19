@@ -1,6 +1,7 @@
 #chart {
   width: 85%;
   position: relative;
+  font-size: 10px;
 }
 
 #chart div{
@@ -16,7 +17,6 @@
   height: 20px;
   color: #444;
   font-family: Helvetica;
-  font-size: 10px;
   padding-top: 2px;
 }
 
