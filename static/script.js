@@ -1,11 +1,18 @@
 
-var scale, total_time;
-var chart = $('#chart');
+var scale, zoom, total_time;
+var chart = $('#chart'), d3chart = d3.select("#chart");
 
 function setup(root){
   scale = d3.scale.linear()
     .domain([root.start, root.finish])
     .range([0, 100]);
+
+  zoom = d3.behavior.zoom()
+      .scaleExtent([1, 10])
+      .on("zoom", zoomed);
+
+  zoom(d3chart);
+
   total_time = (root.finish - root.start);
 
   var elm = nodeAndChildren(root, 0, total_time);
@@ -13,9 +20,24 @@ function setup(root){
   chart.append(elm);
 }
 
+var raw = localStorage.getItem('raw');
+
+if (raw) {
+  setup(JSON.parse(raw));
+}
+
 $('#button').click(function(){
-  setup(JSON.parse($('#trace').val()));
+  var raw = $('#trace').val();
+  localStorage.setItem('raw', raw)
+  setup(JSON.parse(raw));
 });
+
+var chartwrapper = $('#chart > .wrapper').css('transform-origin','0 0')
+
+function zoomed() {
+  var translate = d3.event.translate;
+  chartwrapper.css("transform", "translate(" + translate[0] + 'px, ' + translate[1] + "px) scale(" + d3.event.scale + ")");
+}
 
 //recursively draw stack/time trace
 function nodeAndChildren(node, depth, total_time){
