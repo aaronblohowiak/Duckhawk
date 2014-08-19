@@ -19,6 +19,7 @@
   font-family: Helvetica;
   padding-top: 2px;
   overflow: hidden;
+  cursor: crosshair;
 }
 
 .wrapper {

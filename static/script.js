@@ -52,7 +52,7 @@ function nodeAndChildren(node, depth, total_time){
   var wrapper = $('<div class="wrapper">');
   var entry = $('<div class="entry">'+node.tag+'</div>');
     entry.attr({'tag': node.tag});
-    entry.attr({'title': node.tag});
+    entry.attr({'title': node.tag + ' ' + (node.finish - node.start) + 's'});
     entry.click(function(){
       var obj = _.omit(node, 'children');
       var text = JSON.stringify(obj, undefined, 2);
