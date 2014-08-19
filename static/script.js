@@ -37,7 +37,7 @@ var chartwrapper = $('#chart > .wrapper').css('transform-origin','0 0')
 function zoomed() {
   var translate = d3.event.translate;
   chartwrapper
-    .css('font-size', 10 / d3.event.scale | 0 + 'px')
+    .css('font-size', (5 + 5 / d3.event.scale | 0) + 'px')
     .css("transform", "translate(" + translate[0] + 'px, ' + translate[1] + "px) scale(" + d3.event.scale + ")");
 }
 
@@ -52,6 +52,7 @@ function nodeAndChildren(node, depth, total_time){
   var wrapper = $('<div class="wrapper">');
   var entry = $('<div class="entry">'+node.tag+'</div>');
     entry.attr({'tag': node.tag});
+    entry.attr({'title': node.tag});
     entry.click(function(){
       var obj = _.omit(node, 'children');
       var text = JSON.stringify(obj, undefined, 2);
