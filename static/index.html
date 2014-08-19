@@ -1,108 +1,20 @@
 <html>
-<head>
-  <title>Test</title>
-  <style type="text/css">
-    #chart {
-      width: 85%;
-      position: relative;
-    }
-    #chart div{
-      position: relative;
-      width: 100%;
-    }
-
-    .entry{
-      background-color: skyBlue;
-      border-radius: 4px;
-      margin-top: 5px;
-      width: 100%;
-      height: 20px;
-      color: #444;
-      font-family: Helvetica;
-      font-size: 10px;
-      padding-top: 2px;
-    }
-
-    .wrapper{
-      position:relative;
-      float:left;
-    }
-  </style>
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
-
-</head>
-<body>
-
-  <h1> Yay!</h1>
-  <textarea id="trace">
-    {"tag":"get /","children":[{"tag":"redis.lindex","children":[{"tag":"redis.synchronize","children":[],"id":22,"start":271313.898461353,"finish":271313.898691541,"gc_start":16,"gc_finish":16,"payload":{"key":null}}],"id":21,"start":271313.898453551,"finish":271313.898694981,"gc_start":16,"gc_finish":16,"payload":{"key":"traces"}},{"tag":"redis.sismember","children":[{"tag":"redis.synchronize","children":[],"id":24,"start":271313.898722658,"finish":271313.898920955,"gc_start":16,"gc_finish":16,"payload":{"key":null}}],"id":23,"start":271313.898715545,"finish":271313.898926038,"gc_start":16,"gc_finish":16,"payload":{"key":"TraceRecord:all"}},{"tag":"ohm.load","children":[{"tag":"redis.hgetall","children":[{"tag":"redis.synchronize","children":[],"id":27,"start":271313.898984697,"finish":271313.899177175,"gc_start":16,"gc_finish":16,"payload":{"key":null}}],"id":26,"start":271313.898976912,"finish":271313.899179596,"gc_start":16,"gc_finish":16,"payload":{"key":"TraceRecord:52"}}],"id":25,"start":271313.898949557,"finish":271313.899185364,"gc_start":16,"gc_finish":16,"payload":null},{"tag":"JSON.dump","children":[{"tag":"JSON.generate","children":[{"tag":"to_json","children":[],"id":30,"start":271313.899345776,"finish":271313.899472922,"gc_start":16,"gc_finish":16,"payload":null}],"id":29,"start":271313.899327894,"finish":271313.899477571,"gc_start":16,"gc_finish":16,"payload":null}],"id":28,"start":271313.899318212,"finish":271313.899478928,"gc_start":16,"gc_finish":16,"payload":null}],"id":20,"start":271313.898444227,"finish":271313.899479949,"gc_start":16,"gc_finish":16,"payload":null}
-  </textarea>
-  <input type="submit" id="button"></input>
-  <div id="chart">
-  </div>
-  <div style="clear:both">
-  </div>
-  <pre id="info">
-  </pre>
-<script type="text/javascript">
-
-  var scale, total_time;
-  var chart = $('#chart');
-
-  function setup(root){
-    scale = d3.scale.linear()
-      .domain([root.start, root.finish])
-      .range([0, 100]);
-    total_time = (root.finish - root.start);
-
-    var elm = nodeAndChildren(root, 0, total_time);
-    chart.empty();
-    chart.append(elm);
-  }
-
-  $('#button').click(function(){
-    setup(JSON.parse($('#trace').val()));
-  });
-
-  //recursively draw stack/time trace
-  function nodeAndChildren(node, depth, total_time){
-    //create a div for the node and its children.
-    //create a rectangle for this node.
-    //for each child:
-    //  get the node for it
-    //  set the child's node transform to the appropriate offsets
-
-    var wrapper = $('<div class="wrapper">');
-    var entry = $('<div class="entry">'+node.tag+'</div>');
-      entry.attr({'tag': node.tag});
-      entry.click(function(){
-        var obj = _.omit(node, 'children');
-        var text = JSON.stringify(obj, undefined, 2);
-        console.log(text);
-        $('#info').text(text);
-      });
-    wrapper.append(entry);
-
-    var prevRight = 0;
-    for(var i = 0; i < node.children.length; i = i + 1){
-      var child = node.children[i];
-      var child_node = nodeAndChildren(child, depth+1, total_time);
-      var width =  100 * (child.finish - child.start) / total_time;
-      child_node.css({
-        marginLeft: (scale(child.start) - prevRight) + "%",
-        width:width+"%"
-      });
-      prevRight = scale(child.finish);
-      wrapper.append(child_node);
-    }
-    return wrapper;
-  }
-
-
-
-
-</script>
-</body>
+  <head>
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
+  </head>
+  <body>
+    <h1>Yay!</h1>
+    <textarea id="trace">
+      {"tag":"get /","children":[{"tag":"redis.lindex","children":[{"tag":"redis.synchronize","children":[],"id":22,"start":271313.898461353,"finish":271313.898691541,"gc_start":16,"gc_finish":16,"payload":{"key":null}}],"id":21,"start":271313.898453551,"finish":271313.898694981,"gc_start":16,"gc_finish":16,"payload":{"key":"traces"}},{"tag":"redis.sismember","children":[{"tag":"redis.synchronize","children":[],"id":24,"start":271313.898722658,"finish":271313.898920955,"gc_start":16,"gc_finish":16,"payload":{"key":null}}],"id":23,"start":271313.898715545,"finish":271313.898926038,"gc_start":16,"gc_finish":16,"payload":{"key":"TraceRecord:all"}},{"tag":"ohm.load","children":[{"tag":"redis.hgetall","children":[{"tag":"redis.synchronize","children":[],"id":27,"start":271313.898984697,"finish":271313.899177175,"gc_start":16,"gc_finish":16,"payload":{"key":null}}],"id":26,"start":271313.898976912,"finish":271313.899179596,"gc_start":16,"gc_finish":16,"payload":{"key":"TraceRecord:52"}}],"id":25,"start":271313.898949557,"finish":271313.899185364,"gc_start":16,"gc_finish":16,"payload":null},{"tag":"JSON.dump","children":[{"tag":"JSON.generate","children":[{"tag":"to_json","children":[],"id":30,"start":271313.899345776,"finish":271313.899472922,"gc_start":16,"gc_finish":16,"payload":null}],"id":29,"start":271313.899327894,"finish":271313.899477571,"gc_start":16,"gc_finish":16,"payload":null}],"id":28,"start":271313.899318212,"finish":271313.899478928,"gc_start":16,"gc_finish":16,"payload":null}],"id":20,"start":271313.898444227,"finish":271313.899479949,"gc_start":16,"gc_finish":16,"payload":null}
+    </textarea>
+    <input type="submit" id="button"></input>
+    <div id="chart"></div>
+    <div style="clear:both"></div>
+    <pre id="info"></pre>
+  </body>
 </html>
+<script src="script.js"></script>
