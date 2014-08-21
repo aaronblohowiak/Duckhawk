@@ -94,8 +94,12 @@ $(window).keyup(function (event) {
   if ($('#trace.active')[0]) {
     if (event.which == 37) {
       $('.entry.selected').parent().prev().children().first().click();
+    } else if (event.which == 38) {
+      $('.entry.selected').parent().parent().children().first().click();
     } else if (event.which == 39) {
       $('.entry.selected').parent().next().children().first().click();
+    } else if (event.which == 40) {
+      $('.entry.selected').next().children().first().click();
     }
   }
 });
