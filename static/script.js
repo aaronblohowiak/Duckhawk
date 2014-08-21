@@ -64,11 +64,17 @@ function nodeAndChildren(node, depth, total_time) {
     });
   wrapper.append(entry);
 
+  var parent_time = node.finish - node.start;
+
+  var scale = d3.scale.linear()
+    .domain([node.start, node.finish])
+    .range([0, 100]);
+
   var prevRight = 0;
   for(var i = 0; i < node.children.length; i = i + 1){
     var child = node.children[i];
-    var child_node = nodeAndChildren(child, depth+1, total_time);
-    var width =  100 * (child.finish - child.start) / total_time;
+    var child_node = nodeAndChildren(child, depth+1, parent_time);
+    var width =  100 * (child.finish - child.start) / parent_time;
     child_node.css({
       marginLeft: (scale(child.start) - prevRight) + "%",
       width:width+"%"
