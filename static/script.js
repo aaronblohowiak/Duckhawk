@@ -1,4 +1,13 @@
 
+$('header div').click(function (event) {
+  $('section.active, header div.active')
+    .removeClass('active');
+
+  $('#' + $(event.target).attr('for'))
+    .add(event.target)
+    .addClass('active');
+});
+
 var scale, zoom, total_time;
 var chart = $('#chart'), d3chart = d3.select("#chart");
 
@@ -23,11 +32,12 @@ function setup(root){
 var raw = localStorage.getItem('raw');
 
 if (raw) {
+  $('#data textarea').val(raw);
   setup(JSON.parse(raw));
 }
 
-$('#button').click(function(){
-  var raw = $('#trace').val();
+$('#data button').click(function(){
+  var raw = $('#data textarea').val();
   localStorage.setItem('raw', raw)
   setup(JSON.parse(raw));
 });
@@ -41,14 +51,7 @@ function zoomed() {
     .css("transform", "translate(" + translate[0] + 'px, ' + translate[1] + "px) scale(" + d3.event.scale + ")");
 }
 
-//recursively draw stack/time trace
-function nodeAndChildren(node, depth, total_time){
-  //create a div for the node and its children.
-  //create a rectangle for this node.
-  //for each child:
-  //  get the node for it
-  //  set the child's node transform to the appropriate offsets
-
+function nodeAndChildren(node, depth, total_time) {
   var wrapper = $('<div class="wrapper">');
   var entry = $('<div class="entry">'+node.tag+'</div>');
     entry.attr({'tag': node.tag});
@@ -75,3 +78,8 @@ function nodeAndChildren(node, depth, total_time){
   }
   return wrapper;
 }
+
+$('body').on('click', '.entry', function (event) {
+  $('.entry.selected').removeClass('selected');
+  $(event.target).addClass('selected');
+});
