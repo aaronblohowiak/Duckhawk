@@ -83,3 +83,13 @@ $('body').on('click', '.entry', function (event) {
   $('.entry.selected').removeClass('selected');
   $(event.target).addClass('selected');
 });
+
+$(window).keyup(function (event) {
+  if ($('#trace.active')[0]) {
+    if (event.which == 37) {
+      $('.entry.selected').parent().prev().children().first().click();
+    } else if (event.which == 39) {
+      $('.entry.selected').parent().next().children().first().click();
+    }
+  }
+});
