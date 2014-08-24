@@ -17,6 +17,9 @@ class Trace::Middleware
     Trace.enable_tracing!
 
     Trace.root_id = trace_id || Trace.new_id
+
+    puts "Tracing #{Trace.root_id} #{request.uri} #{request.user_agent}"
+
     parent_id = env['HTTP_X_TRACE_PARENT_ID'] || request['trace_parent_id']
     payload = {
       request:{
