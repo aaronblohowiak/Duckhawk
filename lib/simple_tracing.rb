@@ -26,9 +26,10 @@ class Trace
   attr_accessor :old_trace_context
 
   #root-node-only attrs
-  attr_accessor :start_wall, :end_wall, :host, :pid
+  attr_accessor :host, :pid
 
   #global context
+  @@tracing = false
   @@trace_context = nil
   @@root = nil
 
@@ -44,10 +45,8 @@ class Trace
   def to_hash
     hsh = {}
 
-    if start_wall
+    if host
       hsh.merge!({
-        start_wall: start_wall,
-        end_wall: end_wall,
         host: host,
         pid: pid
       })
@@ -75,15 +74,13 @@ class Trace
       #TODO: http://ruby-doc.org/core-1.9.3/GC/Profiler.html
       self.host = Trace.hostname
       self.pid = ::Process.pid
-      self.start_wall = Time.now.strftime("%Y-%m-%d %H:%M:%S.%5N %z")
     end
   end
 
   def after
-    if self.old_trace_context.nil?
-      self.end_wall = Time.now.strftime("%Y-%m-%d %H:%M:%S.%5N %z")
-    end
     self.gc_finish = GC.count
+    self.start = Trace.epoch_for_monotonic(self.start)
+    self.finish = Trace.epoch_for_monotonic(self.finish)
     notify_complete!
     Trace.trace_context = self.old_trace_context
   end
@@ -129,8 +126,18 @@ class Trace
     @@root_id ||= self.new_id
   end
 
+  def self.epoch_for_monotonic(mono)
+    @@root_time_wall + (mono - @@root_time_monotonic)
+  end
+
   def self.root_id=(id)
     @@root_id = id
+    #when we change roots, lets also update our walltime. within this root,
+    #  we will fake walltime by adding the delta of the monotonic.
+    #  this is more accurate for comparing durations within this procss and faster.
+    @@root_time_wall = Time.now.to_f
+    @@root_time_monotonic = AbsoluteTime.now
+    @@root_id
   end
 
   def self.trace_complete=(proc)

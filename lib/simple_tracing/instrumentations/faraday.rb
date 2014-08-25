@@ -2,7 +2,7 @@
   tracename = "faraday.#{http_method}"
   Faraday::Connection.wrap_around_method http_method, :trace do |old_method, new_method|
     define_method new_method do |*args, &block|
-      Trace.trace tracename do
+      Trace.trace tracename, path: args[0], host: self.url_prefix do
         send(old_method, *args, &block)
       end
     end

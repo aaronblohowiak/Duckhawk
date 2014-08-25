@@ -8,9 +8,9 @@ class Trace::Middleware
 
   def call(env)
     request = Rack::Request.new(env)
-    
+
     trace_id = env['HTTP_X_TRACE_ROOT_ID'] || request['trace_root_id']
-    if trace_id || request.params['please_trace'].nil?
+    if trace_id.nil? && request.params['please_trace'].nil?
       Trace.disable_tracing!
       return @app.call(env)
     end
@@ -18,14 +18,16 @@ class Trace::Middleware
 
     Trace.root_id = trace_id || Trace.new_id
 
-    puts "Tracing #{Trace.root_id} #{request.uri} #{request.user_agent}"
-
     parent_id = env['HTTP_X_TRACE_PARENT_ID'] || request['trace_parent_id']
+
+    puts "Tracing #{Trace.root_id}::#{parent_id} #{request.url} #{request.user_agent}"
+
     payload = {
       request:{
         path: request.path,
         host: request.host,
-        method: request.request_method
+        method: request.request_method,
+        agent: request.user_agent
       }
     }
 
