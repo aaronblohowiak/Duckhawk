@@ -34,7 +34,7 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
   define_method new_method do |*args, &block|
     return send(old_method, *args, &block) unless Trace.tracing?
 
-    t = Trace.new("http.typhoeus.hydra")
+    t = Trace.new(:"http.typhoeus.hydra")
 
     #make a copy because Typhoeus modifies self.queued_requests in-place
     requests_for_timing = [].concat self.queued_requests
@@ -42,7 +42,7 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
     child_traces = []
 
     requests_for_timing.each do |req|
-      child_trace = Trace.new('http.typhoeus.hydra.child', {
+      child_trace = Trace.new(:'http.typhoeus.hydra.child', {
         :'url' => req.url.to_s,
         :'User-Agent' => $user_agent, #TODO: remove this global
         :'original_options' => req.original_options})
@@ -58,7 +58,6 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
 
     t.finish = AbsoluteTime.now
 
-    #for each request in requests_for_timing, create a new trace
     requests_for_timing.each_with_index do |request, index|
       child_t = child_traces[index]
       child_t.payload[:'response_code'] =  request.response.options[:response_code]
