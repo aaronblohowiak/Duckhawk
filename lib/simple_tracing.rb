@@ -99,9 +99,12 @@ class Trace
   def notify_complete!
     return unless @@complete_handler
     begin
+      Trace.disable_tracing!
       @@complete_handler.call(self)
     rescue => e
       $stderr.puts "Could not handle trace completion. #{e.message} #{e.backtrace}"
+    ensure
+      Trace.enable_tracing!
     end
   end
 

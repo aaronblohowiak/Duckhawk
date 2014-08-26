@@ -3,7 +3,7 @@ $:.unshift lib unless $:.include?(lib)
  
 Gem::Specification.new do |s|
   s.name        = 'simple_tracing'
-  s.version     = '0.1.2'
+  s.version     = '0.1.4'
 
   s.date        = '2013-09-13'
   s.summary     = "Simple Tracing and Instrumentation for ruby"
