@@ -59,7 +59,9 @@ class Trace
       root_id: root_id,
       start: start,
       finish: finish,
-      gc_count: (gc_finish && gc_start && (gc_finish - gc_start)),
+      duration: finish-start,
+      gc_start: gc_start,
+      gc_finish: gc_finish,
       payload: (payload && payload.to_hash)
     })
   end
@@ -71,13 +73,22 @@ class Trace
     self.gc_start = GC.count
 
     if !old_trace_context
-      #TODO: http://ruby-doc.org/core-1.9.3/GC/Profiler.html
+      GC::Profiler.clear
+      GC::Profiler.enable
       self.host = Trace.hostname
       self.pid = ::Process.pid
     end
   end
 
   def after
+    if !self.old_trace_context
+      self.payload[:gc_stat] = GC.stat
+      self.payload[:gc_profiler] = GC::Profiler.result
+      self.payload[:gc_totaltime] = GC::Profiler.total_time
+      GC::Profiler.disable
+      GC::Profiler.clear
+    end
+
     self.gc_finish = GC.count
     self.start = Trace.epoch_for_monotonic(self.start)
     self.finish = Trace.epoch_for_monotonic(self.finish)

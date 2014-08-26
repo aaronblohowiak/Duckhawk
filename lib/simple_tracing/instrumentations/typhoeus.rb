@@ -3,11 +3,13 @@ Typhoeus::Request.wrap_around_method :run, :trace do |old_method, new_method|
     return send(old_method, *args, &block) unless Trace.tracing?
 
     t = Trace.new("http.typhoeus")
+    self.options[:headers]['X-Trace-Root-ID'] = Trace.root_id
+    self.options[:headers]['X-Trace-Parent-ID'] = t.id
+
+
     t.before
     t.start = AbsoluteTime.now
-
     tracing_result = send(old_method, *args, &block)
-
     t.finish = AbsoluteTime.now
 
     t.payload.merge!({
@@ -15,15 +17,6 @@ Typhoeus::Request.wrap_around_method :run, :trace do |old_method, new_method|
       :'User-Agent' => $user_agent,
       :'original_options' => self.original_options
     })
-
-    self.original_options[:headers] ||={}
-
-    self.options[:headers]['X-Trace-Root-ID'] = Trace.root_id
-    self.options[:headers]['X-Trace-Parent-ID'] = t.id
-
-    if $trace_config[:backtraces]
-      t.payload[:backtrace] = caller().select{|s| s =~/#{$trace_config[:backtrace_filter]}/ } 
-    end
 
     timing_hack_options = tracing_result.options
     typhoeus_timing_info = timing_hack_options.keys.each do |key|
@@ -43,7 +36,7 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
 
     t = Trace.new("http.typhoeus.hydra")
 
-    #make a copy because Typhoeus modifies this in-place
+    #make a copy because Typhoeus modifies self.queued_requests in-place
     requests_for_timing = [].concat self.queued_requests
 
     child_traces = []
