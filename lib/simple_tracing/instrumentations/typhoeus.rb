@@ -14,7 +14,9 @@ Typhoeus::Request.wrap_around_method :run, :trace do |old_method, new_method|
 
     t.payload.merge!({
       :'url' => self.url.to_s,
-      :'original_options' => self.original_options
+      :'original_options' => self.original_options,
+      :request_size => self.options[:request_size],
+      :response_size => (tracing_result.body.to_s.length rescue nil)
     })
 
     timing_hack_options = tracing_result.options
@@ -59,6 +61,9 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
     requests_for_timing.each_with_index do |request, index|
       child_t = child_traces[index]
       child_t.payload[:'response_code'] =  request.response.options[:response_code]
+
+      child_t.payload[:request_size] = request.options[:request_size]
+      child_t.payload[:response_size] = request.response.body.to_s.length rescue nil
 
       request.response.options.keys.each do |key|
         if key.to_s =~ /time/
