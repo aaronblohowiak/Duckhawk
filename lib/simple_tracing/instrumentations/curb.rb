@@ -10,7 +10,6 @@ Curl::Multi.wrap_around_method :perform, :trace do |old_method, new_method|
     requests_for_timing.each do |req|
       child_trace = Trace.new('http.curb.multi.child', {
         :'url' => req.url.to_s,
-        :'User-Agent' => $user_agent, #TODO: remove this global
         :'original_options' => {
             :body => req.post_body
         }})

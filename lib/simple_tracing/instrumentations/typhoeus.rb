@@ -14,7 +14,6 @@ Typhoeus::Request.wrap_around_method :run, :trace do |old_method, new_method|
 
     t.payload.merge!({
       :'url' => self.url.to_s,
-      :'User-Agent' => $user_agent,
       :'original_options' => self.original_options
     })
 
@@ -44,7 +43,6 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
     requests_for_timing.each do |req|
       child_trace = Trace.new(:'http.typhoeus.hydra.child', {
         :'url' => req.url.to_s,
-        :'User-Agent' => $user_agent, #TODO: remove this global
         :'original_options' => req.original_options})
       child_traces << child_trace
 
