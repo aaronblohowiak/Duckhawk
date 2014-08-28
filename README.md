@@ -15,7 +15,6 @@ HTTP:
 Notifications:
 
     Done: active_support/notifications
-    TODO: Airbrake
 
 Web Frameworks:
 
@@ -34,11 +33,14 @@ HOWTO: Backtraces.
 
   Trace.trace_complete= Proc do |t|
     hsh = t.to_hash
-    if hsh[:duration] > 0.05 #50ms
-      hsh[:payload][:backtrace] = caller() // you probably want to filter this array of file:line strings
-    end
+    return unless hsh[:duration] < 0.05 # skip unless at least 5 millis
+    
+    hsh[:payload][:backtrace] = caller() // you probably want to filter this array of file:line strings
 
-    puts hsh.to_json #send it somewhere useful!
+    redis.multi do
+      redis.lpush(hsh[:root_id], hsh.to_json) #send it somewhere useful!
+      redis.setex(hsh[:root_id], 4.hours)
+    end
   end
 
 
@@ -49,3 +51,14 @@ Trace.enable_tracing!
 Trace.root_id=Trace.new_id
 Trace.trace_complete=Proc.new{|t| puts t.to_json}
 
+
+TODO before 0.2
+==============
+  Config
+  Tests
+  Service-Name
+
+TODO before 1.0
+==============
+  Auto-load & Auto-detect
+  Auto-install (Sinatra, Rails)?
