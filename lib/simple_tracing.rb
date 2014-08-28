@@ -127,6 +127,10 @@ class Trace
     end
   end
 
+  class << self
+    alias_method :instrument, :trace
+  end
+
 ## Global context
   def self.trace_context=(t)
     @@trace_context = t
