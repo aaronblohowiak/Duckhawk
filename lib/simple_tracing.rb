@@ -48,7 +48,8 @@ class Trace
     if host
       hsh.merge!({
         host: host,
-        pid: pid
+        pid: pid,
+        service: @@service_name
       })
     end
 
@@ -157,6 +158,12 @@ class Trace
     @@root_time_monotonic = AbsoluteTime.now
     @@root_id
   end
+
+  def self.service_name=(string)
+    @@service_name = string
+  end
+  @@service_name = nil
+
 
   def self.trace_complete=(proc)
     @@complete_handler = proc

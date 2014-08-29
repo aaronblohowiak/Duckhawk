@@ -18,7 +18,7 @@ class NonCachingFileHandler < WEBrick::HTTPServlet::FileHandler
 end
 
 def get_elasticsearch
-  @example ||= JSON.dump(JSON.load(DATA.read)['hits']['hits'].map{|h| h['_source']})
+  @example ||= JSON.dump(JSON.load(File.read(File.dirname(__FILE__)+"/../data.json"))['hits']['hits'].map{|h| h['_source']})
 end
 
 
@@ -31,7 +31,4 @@ end
 
 trap('INT') { server.stop }
 server.start
-
-
-__END__
 

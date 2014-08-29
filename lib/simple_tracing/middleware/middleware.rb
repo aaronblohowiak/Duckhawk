@@ -27,9 +27,9 @@ class Trace::Middleware
         path: request.path,
         host: request.host,
         method: request.request_method,
-        agent: request.user_agent,
-        parent_id: parent_id
-      }
+        agent: request.user_agent
+      },
+      parent_id: parent_id
     }
 
     status, headers, response = nil

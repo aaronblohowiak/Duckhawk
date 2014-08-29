@@ -2,8 +2,9 @@
 <head>
     <style type="text/css">
         body {
-            font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-weight: 300;
+            font-size: 12px;
             margin: 0;
             padding: 0 00px;
             width: 100%;
@@ -35,6 +36,7 @@
             /* The visualization of the nodes in the trace. */
             width: 100%;
             margin: 0 auto;
+            overflow: hidden;
         }
 
         .trace-node-wrapper {
@@ -43,7 +45,7 @@
             Duration: distance from the earliest observed time of any of its childen to the latest observed time of any of its children. Take special care that children may end after their parent, or begin before their parent. Time in networks is weird.
             */
             clear: right;
-            margin: 4px 0px;
+            margin: 2px 0px;
             border: 1px solid rgba(0,0,0,0.2);
 
         }
@@ -52,6 +54,9 @@
             /* an individual span */
             /* margin-left: x%; the start time */
             /* width: y%; the duration as a percentage of the duration of the parent */
+            border: 0;
+            white-space: nowrap;
+            padding-left : 0.5em;
         }
 
         .trace-cascade.trace-preview{
@@ -61,19 +66,21 @@
             position: fixed;
             top: 0;
             background-color: white;
+            z-index:100;
         }
 
-        .trace-cascade.trace-preview .trace-node-wrapper, .trace-cascade.trace-preview .trace{
+        .trace-cascade.trace-preview .trace-node-wrapper,
+        .trace-cascade.trace-preview .trace{
             height: 4px;
-            top: 0;
-            padding: 0;
             border: 0;
             color: rgba(0,0,0,0);
+            margin: 0;
+
         }
 
         .trace-cascade.trace-preview .trace {
-            border: 0;
             background-color: rgba(0,0,0,0.3);
+            padding: 0;
         }
 
         .trace-preview-blocker{
@@ -87,10 +94,6 @@
 
     <style type="text/css">
         /* TESTING STYLES */
-
-        .body {
-            background-color: black;
-        }
         .trace-contain-everything {
             background-color: black;
         }
@@ -102,6 +105,7 @@
         .trace {
             background-color: #1a8cff;
             color: white;
+            height: 20px;
         }
 
         .trace-viewport {
@@ -116,227 +120,9 @@
 <body>
   <div class="trace-contain-everything">
       <div class="trace-cascade trace-preview">
-        <div class="trace-node-wrapper">
-          <div class="trace">
-            100%
-          </div>
-
-          <div class="trace-node-wrapper" style="width:10%;margin-left:5%">
-            <div class="trace">
-              10%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
-            <div class="trace">
-              30%
-            </div>
-
-            <div class="trace-node-wrapper" style="width:80%;margin-left:3%;">
-              <div class="trace">
-                80%
-              </div>
-
-              <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
-                <div class="trace">
-                  30%
-                </div>
-
-                <div class="trace-node-wrapper" style="width:16%;margin-left:20%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-              </div>
-
-              <div class="trace-node-wrapper" style="width:30%;margin-left:60%">
-                <div class="trace">
-                  30%
-                </div>
-
-                <div class="trace-node-wrapper" style="width:16%;margin-left:33%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-
-                <div class="trace-node-wrapper" style="width:16%;margin-left:60%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-              </div>
-
-
-                <div class="trace-node-wrapper" style="width:3%;margin-left:95%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-            </div>
-
-            <div class="trace-node-wrapper" style="width:2%;margin-left:98%;">
-              <div class="trace">
-                2%
-              </div>
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:80%; margin-left:20%">
-            <div class="trace" style="width:87.5">
-              80%
-            </div>
-
-            <div class="trace-node-wrapper" style="width:10%; margin-left:90%">
-              <div class="trace">
-                6.4%
-              </div>
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:4%;margin-left:22%">
-            <div class="trace">
-              4%
-            </div>
-          </div>
-
-
-          <div class="trace-node-wrapper" style="width:0.1%;margin-left:79.85%">
-            <div class="trace">
-              0.1%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:0.4%;margin-left:79.9%">
-            <div class="trace">
-              0.4%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:0.4%;margin-left:80%">
-            <div class="trace">
-              0.4%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:5%;margin-left:80%">
-            <div class="trace">
-              5%
-            </div>
-          </div>
-        </div>
       </div>
     <div class="trace-viewport">
       <div class="trace-cascade">
-        <div class="trace-node-wrapper">
-          <div class="trace">
-            100%
-          </div>
-
-          <div class="trace-node-wrapper" style="width:10%;margin-left:5%">
-            <div class="trace">
-              10%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
-            <div class="trace">
-              30%
-            </div>
-
-            <div class="trace-node-wrapper" style="width:80%;margin-left:3%;">
-              <div class="trace">
-                80%
-              </div>
-
-              <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
-                <div class="trace">
-                  30%
-                </div>
-
-                <div class="trace-node-wrapper" style="width:16%;margin-left:20%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-              </div>
-
-              <div class="trace-node-wrapper" style="width:30%;margin-left:60%">
-                <div class="trace">
-                  30%
-                </div>
-
-                <div class="trace-node-wrapper" style="width:16%;margin-left:33%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-
-                <div class="trace-node-wrapper" style="width:16%;margin-left:60%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-              </div>
-
-
-                <div class="trace-node-wrapper" style="width:3%;margin-left:95%;">
-                  <div class="trace">
-                    16%
-                  </div>
-                </div>
-            </div>
-
-            <div class="trace-node-wrapper" style="width:2%;margin-left:98%;">
-              <div class="trace">
-                2%
-              </div>
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:80%; margin-left:20%">
-            <div class="trace" style="width:87.5">
-              80%
-            </div>
-
-            <div class="trace-node-wrapper" style="width:10%; margin-left:90%">
-              <div class="trace">
-                6.4%
-              </div>
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:4%;margin-left:22%">
-            <div class="trace">
-              4%
-            </div>
-          </div>
-
-
-          <div class="trace-node-wrapper" style="width:0.1%;margin-left:79.85%">
-            <div class="trace">
-              0.1%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:0.4%;margin-left:79.9%">
-            <div class="trace">
-              0.4%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:0.4%;margin-left:80%">
-            <div class="trace">
-              0.4%
-            </div>
-          </div>
-
-          <div class="trace-node-wrapper" style="width:5%;margin-left:80%">
-            <div class="trace">
-              5%
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 </div>
@@ -346,6 +132,7 @@
     window.onhashchange = function(){
         console.log(window.location.hash)
     }
+
 
     var cascade = $('.trace-viewport > .trace-cascade');
     var viewport = $('.trace-viewport');
@@ -411,13 +198,10 @@
         var startOffset;
         var currentOffset;
 
-
-
         preview.mousedown(function(event){
             selecting = true;
             startOffset = event.pageX;
             currentOffset = startOffset;
-            console.log(startOffset)
             return false
         });
 
@@ -448,6 +232,185 @@
             updateViewingWindow(start, stop);
         }
     })();
+
+
+    // The Tree is a K-ary tree of Wrappers and Traces
+    // A Trace has a min and a max
+    // A wrapper may have a single Trace, a non-empty array children or both.
+    // A wrapper has an array of wrappers, its children.
+    // The min of a Wrapper is the lesser of its Trace min and the min of its children.
+    // The max of a wrapper is the greater of its Trace max and the max of its children.
+    // The children of a Wrapper are sorted by min
+
+    //wrap each Trace in a wrapper
+    // build a hash from Trace id to wrapper. If a wrapper and a trace already exist in the hash, merge the Traces and wrappers.
+    // For each wrapper, if its Trace's parent_id is in the hash, append the Trace to the children of the wrapper. Otherwise, generate a wrapper for the parent_id, add it to the hash, add the current wrapper to the new one's children and append the new wrapper to the children of the Root.
+    // Sort the children of the root. For each child, sort its children, recursively.
+    // generate the preview and the cascade.
+    function Wrapper(trace){
+      this.trace = trace;
+      this.children = [];
+    }
+
+    Wrapper.prototype.min = function(cacheOk) {
+      if(cacheOk && this._min){
+        return this._min
+      }
+
+      var minChildren
+      if(this.children.length > 0 ){
+        minChildren = Math.min.apply(Math, $.map(this.children, function(child){return child.min(cacheOk)}));
+      }else{
+        minChildren = Infinity
+      }
+
+      if(this.trace && this.trace.start){
+        return this._min = Math.min(minChildren, this.trace.start)
+      }else{
+        return this._min = minChildren;
+      }
+    }
+
+    //TODO: handle if max or min are Infinity or -Infinity (missing trace info)
+    Wrapper.prototype.duration = function(cacheOk){
+      return (this.max(cacheOk) - this.min(cacheOk))
+    }
+
+    Wrapper.prototype.max = function(cacheOk) {
+      if(cacheOk && this._max){
+        return this._max
+      }
+
+      var maxChildren
+      if(this.children.length > 0 ){
+        maxChildren = Math.max.apply(Math, $.map(this.children, function(child){return child.max(cacheOk)}));
+      }else{
+        maxChildren = -1 * Infinity
+      }
+
+      if(this.trace && this.trace.finish){
+        return this._max = Math.max(maxChildren, this.trace.finish)
+      }else{
+        return this._max = maxChildren;
+      }
+    }
+
+    Wrapper.prototype.merge = function(trace) {
+      if(this.trace){
+        console.log("merge?", this, trace)  
+      }else {
+        this.trace = trace;
+      }
+    }
+
+    Wrapper.prototype.sort = function(cacheOk){
+      if(cacheOk){
+        this.children.sort(Wrapper.compareCached);  
+      }else{
+        throw("Not Implemented");
+      }
+
+      for (var i = this.children.length - 1; i >= 0; i--) {
+        this.children[i].sort(cacheOk);
+      };
+    }
+
+    Wrapper.compareCached = function (b, a) {
+      if (a.min(true) < b.min(true))
+         return -1;
+      if (a.min(true) > b.min(true))
+         return 1;
+      return 0;
+    }
+
+    function process(trace, wrappers, root){
+      console.log("hi!", trace.id, trace.parent_id, trace.host)
+
+      var existing = wrappers[trace.id];
+      if(existing){
+        existing.merge(trace);
+        return existing;
+      }
+
+      myWrapper = new Wrapper(trace);
+      wrappers[trace.id] = myWrapper
+
+      if(!trace.parent_id){
+        console.log("root?", trace)
+        root.children.push(myWrapper);
+        return
+      }
+
+      var parent = wrappers[trace.parent_id];
+      if(!parent){
+        parent = new Wrapper();
+        wrappers[trace.parent_id] = parent;
+        root.children.push(parent);
+      }
+
+      parent.children.push(myWrapper);
+
+      return myWrapper;
+    }
+
+    var wrappers = {};
+    var root = new Wrapper()
+    $.get('/data', function(data){
+      data = JSON.parse(data)
+
+      console.log(data.length)
+      for (var i = data.length - 1; i >= 0; i--) {
+        process(data[i], wrappers, root)
+      };
+
+      cascade.data({min: root.min(), max: root.max(), duration: root.duration()});
+      root.sort(true)
+
+      render(root, cascade);
+      render(root, preview);
+    });
+
+    //note: before this fn is called on root, the max and min must be called and the children must be sorted.
+    function render(wrapper, parentElm){
+      var wrapperElm = $('<div class="trace-node-wrapper"></div>');
+      var duration = wrapper.duration(true);
+      var width = ((duration / parentElm.data()['duration']) * 100) + "%";
+      var left = (wrapper.min(true) - parentElm.data()['min']) / parentElm.data()['duration'];
+
+
+      wrapperElm.css({
+        width: width,
+        marginLeft: (left * 100) + "%"
+      }).data({
+        wrapper: wrapper,
+        max: wrapper.max(true),
+        min: wrapper.min(true),
+        duration: duration
+      });
+
+      if(wrapper.trace){
+        var trace = wrapper.trace;
+        var traceElm = $('<div class="trace"></div>');
+        duration = trace.finish - trace.start;
+        traceElm.css({
+          width: ((duration / wrapperElm.data()['duration']) * 100) + "%"
+        }).data({
+          trace: trace
+        });
+        wrapperElm.append(traceElm);
+
+        var about = $('<div>')
+        about.html(trace.tag)
+        traceElm.append(about)
+      }
+
+      for (var i = wrapper.children.length - 1; i >= 0; i--) {
+        render(wrapper.children[i], wrapperElm);
+      }
+
+      parentElm.append(wrapperElm);
+      return wrapperElm;
+    }
 </script>
 </body>
 </html>
