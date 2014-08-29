@@ -1,0 +1,453 @@
+<html>
+<head>
+    <style type="text/css">
+        body {
+            font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+            font-weight: 300;
+            margin: 0;
+            padding: 0 00px;
+            width: 100%;
+        }
+
+        .trace,
+        .trace-node-wrapper,
+        .trace-cascade,
+        .trace-viewport,
+        .trace-contain-everything
+        {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 4px;
+        }
+
+        .trace-contain-everything {
+            /* EVERYTHING in the trace itself. multiple per-page */
+        }
+
+        .trace-viewport {
+            overflow: scroll;
+            position: relative;
+            top: 100px;
+        }
+
+        .trace-cascade {
+            /* The visualization of the nodes in the trace. */
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .trace-node-wrapper {
+            /* Wraps the trace AND all of its children.
+                the width of this element is equal to the duration as a percentage of its parent's duration 
+            Duration: distance from the earliest observed time of any of its childen to the latest observed time of any of its children. Take special care that children may end after their parent, or begin before their parent. Time in networks is weird.
+            */
+            clear: right;
+            margin: 4px 0px;
+            border: 1px solid rgba(0,0,0,0.2);
+
+        }
+
+        .trace {
+            /* an individual span */
+            /* margin-left: x%; the start time */
+            /* width: y%; the duration as a percentage of the duration of the parent */
+        }
+
+        .trace-cascade.trace-preview{
+            width: 100%;
+            position: relative;
+            height: 100px;
+            position: fixed;
+            top: 0;
+            background-color: white;
+        }
+
+        .trace-cascade.trace-preview .trace-node-wrapper, .trace-cascade.trace-preview .trace{
+            height: 4px;
+            top: 0;
+            padding: 0;
+            border: 0;
+            color: rgba(0,0,0,0);
+        }
+
+        .trace-cascade.trace-preview .trace {
+            border: 0;
+            background-color: rgba(0,0,0,0.3);
+        }
+
+        .trace-preview-blocker{
+            position: absolute;
+            background-color: rgba(0,0,0,0.2);
+            height: 100%;
+            top: 0;
+        }
+
+    </style>
+
+    <style type="text/css">
+        /* TESTING STYLES */
+
+        .body {
+            background-color: black;
+        }
+        .trace-contain-everything {
+            background-color: black;
+        }
+
+        .trace-node-wrapper {
+            background-color: rgba(255,255,255,0.07);
+        }
+
+        .trace {
+            background-color: #1a8cff;
+            color: white;
+        }
+
+        .trace-viewport {
+            background-color: black;
+            border: 1px solid #000;
+            border-radius: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+  <div class="trace-contain-everything">
+      <div class="trace-cascade trace-preview">
+        <div class="trace-node-wrapper">
+          <div class="trace">
+            100%
+          </div>
+
+          <div class="trace-node-wrapper" style="width:10%;margin-left:5%">
+            <div class="trace">
+              10%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
+            <div class="trace">
+              30%
+            </div>
+
+            <div class="trace-node-wrapper" style="width:80%;margin-left:3%;">
+              <div class="trace">
+                80%
+              </div>
+
+              <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
+                <div class="trace">
+                  30%
+                </div>
+
+                <div class="trace-node-wrapper" style="width:16%;margin-left:20%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+              </div>
+
+              <div class="trace-node-wrapper" style="width:30%;margin-left:60%">
+                <div class="trace">
+                  30%
+                </div>
+
+                <div class="trace-node-wrapper" style="width:16%;margin-left:33%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+
+                <div class="trace-node-wrapper" style="width:16%;margin-left:60%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+              </div>
+
+
+                <div class="trace-node-wrapper" style="width:3%;margin-left:95%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+            </div>
+
+            <div class="trace-node-wrapper" style="width:2%;margin-left:98%;">
+              <div class="trace">
+                2%
+              </div>
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:80%; margin-left:20%">
+            <div class="trace" style="width:87.5">
+              80%
+            </div>
+
+            <div class="trace-node-wrapper" style="width:10%; margin-left:90%">
+              <div class="trace">
+                6.4%
+              </div>
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:4%;margin-left:22%">
+            <div class="trace">
+              4%
+            </div>
+          </div>
+
+
+          <div class="trace-node-wrapper" style="width:0.1%;margin-left:79.85%">
+            <div class="trace">
+              0.1%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:0.4%;margin-left:79.9%">
+            <div class="trace">
+              0.4%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:0.4%;margin-left:80%">
+            <div class="trace">
+              0.4%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:5%;margin-left:80%">
+            <div class="trace">
+              5%
+            </div>
+          </div>
+        </div>
+      </div>
+    <div class="trace-viewport">
+      <div class="trace-cascade">
+        <div class="trace-node-wrapper">
+          <div class="trace">
+            100%
+          </div>
+
+          <div class="trace-node-wrapper" style="width:10%;margin-left:5%">
+            <div class="trace">
+              10%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
+            <div class="trace">
+              30%
+            </div>
+
+            <div class="trace-node-wrapper" style="width:80%;margin-left:3%;">
+              <div class="trace">
+                80%
+              </div>
+
+              <div class="trace-node-wrapper" style="width:30%;margin-left:10%">
+                <div class="trace">
+                  30%
+                </div>
+
+                <div class="trace-node-wrapper" style="width:16%;margin-left:20%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+              </div>
+
+              <div class="trace-node-wrapper" style="width:30%;margin-left:60%">
+                <div class="trace">
+                  30%
+                </div>
+
+                <div class="trace-node-wrapper" style="width:16%;margin-left:33%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+
+                <div class="trace-node-wrapper" style="width:16%;margin-left:60%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+              </div>
+
+
+                <div class="trace-node-wrapper" style="width:3%;margin-left:95%;">
+                  <div class="trace">
+                    16%
+                  </div>
+                </div>
+            </div>
+
+            <div class="trace-node-wrapper" style="width:2%;margin-left:98%;">
+              <div class="trace">
+                2%
+              </div>
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:80%; margin-left:20%">
+            <div class="trace" style="width:87.5">
+              80%
+            </div>
+
+            <div class="trace-node-wrapper" style="width:10%; margin-left:90%">
+              <div class="trace">
+                6.4%
+              </div>
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:4%;margin-left:22%">
+            <div class="trace">
+              4%
+            </div>
+          </div>
+
+
+          <div class="trace-node-wrapper" style="width:0.1%;margin-left:79.85%">
+            <div class="trace">
+              0.1%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:0.4%;margin-left:79.9%">
+            <div class="trace">
+              0.4%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:0.4%;margin-left:80%">
+            <div class="trace">
+              0.4%
+            </div>
+          </div>
+
+          <div class="trace-node-wrapper" style="width:5%;margin-left:80%">
+            <div class="trace">
+              5%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<script>
+    window.onhashchange = function(){
+        console.log(window.location.hash)
+    }
+
+    var cascade = $('.trace-viewport > .trace-cascade');
+    var viewport = $('.trace-viewport');
+
+
+    //pass in the start/stop as a percentage (0.20 for 20%) of total
+    // set the width and zoom of the viewport to match
+    function updateViewingWindow(start, stop){
+        //set the width.
+        var percentToCover = stop - start;
+        var zoomRatio = 1 / percentToCover;
+        var newWidth = 100 * zoomRatio; // css width is "200%"" not "2"
+
+
+        cascade.css({width: newWidth+"%"});
+        var cascadeWidth = cascade.width();
+        viewportWidthPercent = stop - start;
+        viewport.scrollLeft(cascadeWidth * start);
+    }
+
+    function highlight(start, stop){
+        console.log(start, stop)
+        leftBox.css({
+            width: (start * 100)+"%"
+        })
+
+        rightBox.css({
+            width: ((1 - stop) * 100 + "%"),
+            right: 0
+        })
+    }
+
+    function viewportChanged(){
+        var cascadeWidth = cascade.width();
+        var viewportWidth = viewport.width();
+
+        var scrollLeft = viewport.scrollLeft();
+
+        var start = scrollLeft / cascadeWidth;
+        var stop = start + (viewportWidth / cascadeWidth);
+        highlight(start, stop);
+    }
+
+    viewport.scroll(viewportChanged);
+    $(window).resize(viewportChanged);
+
+    $(document).keyup(function(e) {
+        if(e.keyCode == 27){
+            highlight(0, 100);
+            updateViewingWindow(0, 1);
+        }
+    });
+
+    var preview = $('.trace-cascade.trace-preview');
+
+    var leftBox = $('<div class="trace-preview-blocker"></div>');
+    var rightBox = $('<div class="trace-preview-blocker"></div>');
+    preview.append(leftBox);
+    preview.append(rightBox);
+
+    (function() {
+        var selecting = false;
+        var startOffset;
+        var currentOffset;
+
+
+
+        preview.mousedown(function(event){
+            selecting = true;
+            startOffset = event.pageX;
+            currentOffset = startOffset;
+            console.log(startOffset)
+            return false
+        });
+
+        preview.mousemove(function(event){
+            if(selecting){
+                currentOffset = event.pageX;
+                updateSelectedRegion()
+            }
+            return false
+        });
+
+        preview.mouseup(function(event){
+            stopSelectingPreview();
+        })
+
+        function stopSelectingPreview(){
+            selecting = false;
+            updateSelectedRegion()
+        }
+
+        function updateSelectedRegion(){
+            var selectionStart = Math.min(startOffset, currentOffset);
+            var selectionStop = Math.max(startOffset, currentOffset);
+
+            var previewWidth = preview.width();
+            start = selectionStart/previewWidth;
+            stop = selectionStop/previewWidth;
+            updateViewingWindow(start, stop);
+        }
+    })();
+</script>
+</body>
+</html>
