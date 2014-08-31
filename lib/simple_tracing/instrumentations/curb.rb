@@ -4,9 +4,11 @@ Curl::Multi.wrap_around_method :perform, :trace do |old_method, new_method|
     return send(old_method, *args, &block) unless Trace.tracing?
 
     t = Trace.new :'http.curb.multi'
+    t.before
 
     requests_for_timing = [].concat self.requests
     child_traces = []
+
     requests_for_timing.each do |req|
       child_trace = Trace.new('http.curb.multi.child', {
         :'url' => req.url.to_s,
@@ -18,10 +20,8 @@ Curl::Multi.wrap_around_method :perform, :trace do |old_method, new_method|
       req.headers[:'X-Trace-Root-ID'] = Trace.root_id
       req.headers[:'X-Trace-Parent-ID'] = child_trace.id
     end
-      
 
     t.start = AbsoluteTime.now
-    t.before
     tracing_result = send(old_method, *args, &block)
     t.finish = AbsoluteTime.now
 
