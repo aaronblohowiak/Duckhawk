@@ -174,10 +174,17 @@
         var start = scrollLeft / cascadeWidth;
         var stop = start + (viewportWidth / cascadeWidth);
         highlight(start, stop);
+        return true;
     }
 
     viewport.scroll(viewportChanged);
-    $(window).resize(viewportChanged);
+
+    var resizingWindow;
+    $(window).resize(function(){
+      viewportChanged()
+      // clearTimeout(resizingWindow);
+      // resizingWindow = setTimeout(viewportChanged, 10);
+    });
 
     $(document).keyup(function(e) {
         if(e.keyCode == 27){
@@ -323,8 +330,8 @@
       return 0;
     }
 
-    function process(trace, wrappers, root){
-      console.log("hi!", trace.id, trace.parent_id, trace.host)
+    function add(trace, wrappers, root){
+      console.log("SEEN", trace.id )
 
       var existing = wrappers[trace.id];
       if(existing){
@@ -332,25 +339,27 @@
         return existing;
       }
 
-      myWrapper = new Wrapper(trace);
+      var myWrapper = new Wrapper(trace);
       wrappers[trace.id] = myWrapper
+    }
 
+    function process(trace, wrappers, root){
       if(!trace.parent_id){
-        console.log("root?", trace)
-        root.children.push(myWrapper);
+        root.children.push(wrappers[trace.id]);
         return
       }
 
       var parent = wrappers[trace.parent_id];
       if(!parent){
+        console.log("MISSING", trace.parent_id )
         parent = new Wrapper();
         wrappers[trace.parent_id] = parent;
         root.children.push(parent);
       }
 
-      parent.children.push(myWrapper);
+      parent.children.push(wrappers[trace.id]);
 
-      return myWrapper;
+      return wrappers[trace.id];
     }
 
     var wrappers = {};
@@ -358,7 +367,10 @@
     $.get('/data', function(data){
       data = JSON.parse(data)
 
-      console.log(data.length)
+      for (var i = data.length - 1; i >= 0; i--) {
+        add(data[i], wrappers, root)
+      };
+
       for (var i = data.length - 1; i >= 0; i--) {
         process(data[i], wrappers, root)
       };
@@ -399,8 +411,22 @@
         });
         wrapperElm.append(traceElm);
 
-        var about = $('<div>')
-        about.html(trace.tag)
+        var about = $('<div class="about">')
+        var ms = Math.round((trace.finish - trace.start) * 10000) / 10 ;
+
+        var what;
+
+        if(trace.payload) {
+          what = (trace.payload && trace.payload.url || trace.payload.path || "");
+          if(trace.payload.request){
+            what += " " + trace.payload.request.host;
+          }
+        }
+
+        about.html(trace.tag + " &nbsp;" + ms + "ms " + what + "")
+        about.data({
+          trace: trace
+        });
         traceElm.append(about)
       }
 
@@ -411,6 +437,27 @@
       parentElm.append(wrapperElm);
       return wrapperElm;
     }
+
+    $('.trace-viewport').on('click', 'div.trace', function(e){
+      console.log(e)
+      trace = $(e.target).data('trace');
+
+      var newWindow = window.open("","","width="+(preview.width() * 0.6)+",height=600,scrollbars=1,resizable=1")
+
+      //read text from textbox placed in parent window
+      var text = JSON.stringify(trace, null, 2)
+      var tmpElm = $('<div id="editor"></div>')
+      tmpElm.text(text);
+      text = tmpElm.html()
+
+      var html = "<html><head></head><body><pre>"+ text +"</pre>"
+      html += "</body></html>"
+
+      newWindow .document.open()
+      newWindow .document.write(html)
+      newWindow .document.close()
+
+    })
 </script>
 </body>
 </html>
