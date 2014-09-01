@@ -17,17 +17,16 @@ Net::HTTP.wrap_around_method :request, :trace do |old_method, new_method|
     req['X-Trace-Parent-ID'] = t.id
 
     t.before
-    t.start = AbsoluteTime.now
     result = nil
+    t.start = AbsoluteTime.now
     begin
       result = send(old_method, *args, &block)
+    else
       t.finish = AbsoluteTime.now
-      t.after
       return result
-    rescue => e
-      t.finish = AbsoluteTime.now
+    ensure
+      t.finish ||= AbsoluteTime.now
       t.after
-      raise e
     end
   end
 end

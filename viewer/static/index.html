@@ -307,6 +307,7 @@
         console.log("merge?", this, trace)  
       }else {
         this.trace = trace;
+        console.log("MERGED", trace.id)
       }
     }
 
@@ -364,7 +365,7 @@
 
     var wrappers = {};
     var root = new Wrapper()
-    $.get('/data', function(data){
+    $.get('/data?id=' + window.location.hash.replace('#', ''), function(data){
       data = JSON.parse(data)
 
       for (var i = data.length - 1; i >= 0; i--) {
@@ -402,8 +403,10 @@
 
       if(wrapper.trace){
         var trace = wrapper.trace;
-        var traceElm = $('<div class="trace"></div>');
         duration = trace.finish - trace.start;
+
+        var traceElm = $(document.createElement('div'));
+        traceElm.addClass('trace');
         traceElm.css({
           width: ((duration / wrapperElm.data()['duration']) * 100) + "%"
         }).data({
@@ -411,7 +414,9 @@
         });
         wrapperElm.append(traceElm);
 
-        var about = $('<div class="about">')
+        var about = $(document.createElement('div'));
+        traceElm.addClass('about');
+
         var ms = Math.round((trace.finish - trace.start) * 10000) / 10 ;
 
         var what;

@@ -1,4 +1,4 @@
-Redis.instance_methods(false).each do |name|
+(Redis.instance_methods(false) - [:synchronize]).each do |name|
   Redis.wrap_around_method name, :trace do |old_method, new_method|
     define_method new_method do |*args, &block|
       Trace.trace "redis.#{name}", :key => args[0] do

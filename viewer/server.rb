@@ -17,8 +17,52 @@ class NonCachingFileHandler < WEBrick::HTTPServlet::FileHandler
 
 end
 
-def get_elasticsearch
-  @example ||= JSON.dump(JSON.load(File.read(File.dirname(__FILE__)+"/../data.json"))['hits']['hits'].map{|h| h['_source']})
+require 'net/http'
+def get_elasticsearch(id)
+  uri = URI.parse(ENV['ES_URL'])
+
+  body = JSON.dump({
+    "query" => {
+      "filtered"=> {
+        "filter"=> {
+          "fquery"=> {
+            "query"=> {
+              "query_string" => {
+                "query"=> "root_id:\""+id+"\""
+              }
+            }
+          }
+        }
+      }
+    },
+    "size" => 10000
+  })
+
+  uri_without_basic_auth = uri.scheme+"://"+uri.host+uri.path
+  post =  Net::HTTP::Post.new(uri_without_basic_auth)
+
+
+  post['Content-Type'] = 'application/json'
+  post.body = body
+  post.basic_auth(uri.user, uri.password)
+
+  http = Net::HTTP.new(uri.hostname, uri.port)
+  http.use_ssl = true
+  res = http.start do |http|
+    http.request(post)
+  end
+
+  JSON.load(res.body)['hits']['hits'].map{|h| h['_source']}
+end
+
+require 'json'
+
+require 'redis' rescue nil
+@trace_redis = Redis.connect rescue nil
+
+def get_redis(id)
+  return [] unless @trace_redis
+  @trace_redis.lrange("trace::#{id}", 0, -1).map{|t| JSON.load(t)}
 end
 
 
@@ -26,7 +70,8 @@ server = WEBrick::HTTPServer.new :Port => 1337
 server.mount "/", NonCachingFileHandler, File.dirname(__FILE__)+"/static"
 
 server.mount_proc '/data' do |req, res|
-  res.body = get_elasticsearch()
+  id = req.query["id"]
+  res.body = JSON.dump(get_redis(id) + get_elasticsearch(id))
 end
 
 trap('INT') { server.stop }
