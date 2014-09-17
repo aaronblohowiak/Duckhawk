@@ -8,7 +8,7 @@ DB:
 
 HTTP:
 
-    Done: Curb, Typhoeus, Faraday*, Net::HTTP (httparty, rest-client)
+    Done: Curb, Typhoeus (Faraday), Net::HTTP (httparty, rest-client, Faraday)
     TODO: httpclient,  Patron
     WONT: em*
 
@@ -54,9 +54,11 @@ Trace.trace_complete=Proc.new{|t| puts t.to_json}
 
 TODO before 0.2
 ==============
-  Config
+  Move all the host/service/gc stuff to before/after hooks
+  Consider a helper class instead of a proc
+  Config headers, param name, backtrace en/disable
   Tests
-  Service-Name
+  Trace.annotate({}) #add to current trace's payload
 
 TODO before 1.0
 ==============

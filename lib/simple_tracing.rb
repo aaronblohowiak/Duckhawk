@@ -132,6 +132,11 @@ class Trace
     alias_method :instrument, :trace
   end
 
+  def self.annotate(payload)
+    return unless self.trace_context
+    self.trace_context.payload.merge!(payload)
+  end
+
 ## Global context
   def self.trace_context=(t)
     @@trace_context = t
@@ -146,6 +151,7 @@ class Trace
   end
 
   def self.epoch_for_monotonic(mono)
+    return nil unless mono && @@root_time_monotonic
     @@root_time_wall + (mono - @@root_time_monotonic)
   end
 
@@ -163,7 +169,6 @@ class Trace
     @@service_name = string
   end
   @@service_name = nil
-
 
   def self.trace_complete=(proc)
     @@complete_handler = proc

@@ -60,8 +60,7 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
 
     requests_for_timing.each_with_index do |request, index|
       child_t = child_traces[index]
-      child_t.payload[:'response_code'] =  request.response.options[:response_code]
-
+      child_t.payload[:response_code] =  request.response.options[:response_code]
       child_t.payload[:request_size] = request.options[:request_size]
       child_t.payload[:response_size] = request.response.body.to_s.length rescue nil
 
@@ -70,7 +69,7 @@ Typhoeus::Hydra.wrap_around_method :run, :trace do |old_method, new_method|
           child_t.payload[key.to_s] = request.response.options[key]
         end
       end
-    
+
       child_t.before
       child_t.start = t.start
       child_t.finish = t.start + child_t.payload['total_time'].to_f
