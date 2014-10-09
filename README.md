@@ -44,6 +44,14 @@ HOWTO: Backtraces.
   end
 
 
+HOWTO: Use Web UI
+==============
+
+`ES_URL='https://username:password@kibana.example.com/logstash-2014.10.09/_search?pretty' ruby viewer/server.rb`
+
+open `http:/localhost:1337/#kjenfkjenkjn3` in the browser, where 'kjenfkjenkjn3' is the X-Trace-Id
+
+
 HOWTO: Use in terminal
 ==============
 
