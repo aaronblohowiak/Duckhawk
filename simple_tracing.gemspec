@@ -1,11 +1,11 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
- 
+
 Gem::Specification.new do |s|
   s.name        = 'simple_tracing'
-  s.version     = '0.1.15'
+  s.version     = '0.1.16'
 
-  s.date        = '2013-09-13'
+  s.date        = '2015-01-26'
   s.summary     = "Simple Tracing and Instrumentation for ruby"
   s.description = "A way of tracing your apps' network calls and slow code."
   s.authors     = ["Aaron Blohowiak"]
