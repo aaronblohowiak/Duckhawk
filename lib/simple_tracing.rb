@@ -88,7 +88,6 @@ class Trace
       self.payload[:gc_totaltime] = GC::Profiler.total_time
       GC::Profiler.disable
       GC::Profiler.clear
-      Trace.root_id = nil
     end
 
     self.gc_finish = GC.count

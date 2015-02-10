@@ -38,6 +38,7 @@ class Trace::Middleware
     end
 
     headers['X-TRACE-ID'] = Trace.root_id
+    Trace.root_id = nil
     [status, headers, response]
   end
 end
