@@ -3,8 +3,7 @@ simple-tracing
 
 DB:
 
-    Done: Redis, MongoMapper (mongo-ruby-driver 1.x), ActiveRecord (active_support/notifications)
-    TODO: Mongoid
+    Done: Redis, MongoMapper (mongo-ruby-driver 1.x), ActiveRecord (active_support/notifications), Moped (Mongoid)
 
 HTTP:
 
