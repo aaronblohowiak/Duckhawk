@@ -34,10 +34,10 @@ class Trace::Middleware
 
     status, headers, response = nil
     Trace.trace('middleware', payload) do
+      headers['X-TRACE-ID'] = Trace.root_id
       status, headers, response = @app.call(env)
     end
 
-    headers['X-TRACE-ID'] = Trace.root_id
     Trace.root_id = nil
     [status, headers, response]
   end
