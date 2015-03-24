@@ -20,8 +20,7 @@ class Trace::Middleware
     end
 
     Trace.root_id = trace_id || Trace.new_id
-    headers['X-TRACE-ID'] = Trace.root_id
-    
+
     Trace.with_tracing do
       parent_id = env['HTTP_X_TRACE_PARENT_ID'] || request['trace_parent_id']
 
@@ -41,6 +40,7 @@ class Trace::Middleware
         status, headers, response = @app.call(env)
       end
 
+      headers['X-TRACE-ID'] = Trace.root_id
       return [status, headers, response]
     end
   end
