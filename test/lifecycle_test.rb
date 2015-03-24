@@ -12,25 +12,28 @@ class TestLifecycle < Minitest::Test
 
   def test_tracing_enabled
     Trace.root_id = Trace.new_id
-    Trace.enable_tracing!
-    trace!
+    Trace.with_tracing do
+      trace!
+    end
     assert_equal 'hello', @traces.first.tag
   end
 
   def test_tracing_disabled
     assert_equal @traces, []
-    Trace.disable_tracing!
-    trace!
+    Trace.without_tracing do
+      trace!
+    end
     assert_equal @traces, []
   end
 
   def test_manual_tracing
     Trace.root_id = Trace.new_id
-    Trace.enable_tracing!
-    t = Trace.new('manual')
-    t.before
-    t.payload[:testing] = 123
-    t.after
+    Trace.with_tracing do
+      t = Trace.new('manual')
+      t.before
+      t.payload[:testing] = 123
+      t.after
+    end
     output = @traces.first
     assert_equal 'manual', output.tag
     assert_equal 123, output.payload[:testing]

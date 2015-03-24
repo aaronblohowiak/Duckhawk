@@ -5,7 +5,6 @@ class TestAnnotation < Minitest::Test
     @traces = []
     Trace.trace_complete = Proc.new{|t| @traces << t}
     Trace.root_id = Trace.new_id
-    Trace.enable_tracing!
   end
 
   def trace_with_annotate
@@ -13,14 +12,17 @@ class TestAnnotation < Minitest::Test
   end
 
   def test_annotate
-    trace_with_annotate    
+    Trace.with_tracing do
+      trace_with_annotate
+    end
     assert_equal :cute, @traces.first.payload[:kitten]
   end
 
   def test_annotate_when_not_tracing
     assert_equal @traces, []
-    Trace.disable_tracing!
-    trace_with_annotate
+    Trace.without_tracing do
+      trace_with_annotate
+    end
     assert_equal @traces, []
   end
 end

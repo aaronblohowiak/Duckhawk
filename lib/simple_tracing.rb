@@ -28,11 +28,6 @@ class Trace
   #root-node-only attrs
   attr_accessor :host, :pid
 
-  #global context
-  @@tracing = false
-  @@trace_context = nil
-  @@root = nil
-
   def initialize(tag, payload = {})
     self.tag = tag
     self.id = Trace.new_id
@@ -98,14 +93,43 @@ class Trace
   end
 
   def notify_complete!
-    return unless @@complete_handler
+    if !@@complete_handler
+      $stderr.puts "Could not handle trace completion because there is no completion handler."
+      return
+    end
+
     begin
-      Trace.disable_tracing!
-      @@complete_handler.call(self)
+      Trace.without_tracing do
+        @@complete_handler.call(self)
+      end
     rescue => e
       $stderr.puts "Could not handle trace completion. #{e.message} #{e.backtrace}"
+    end
+  end
+
+  def self.reset_thread_state!
+    Thread.current[:simple_trace_context] = nil
+    Thread.current[:simple_tracing_enabled] = nil
+    Thread.current[:simple_trace_root_id] = nil
+  end
+
+  def self.without_tracing
+    Thread.current[:simple_tracing_enabled] ||= []
+    Thread.current[:simple_tracing_enabled].push(false)
+    begin
+      yield
     ensure
-      Trace.enable_tracing!
+      Thread.current[:simple_tracing_enabled].pop
+    end
+  end
+
+  def self.with_tracing
+    begin
+      Thread.current[:simple_tracing_enabled] ||= []
+      Thread.current[:simple_tracing_enabled].push(true)
+      yield
+    ensure
+      Thread.current[:simple_tracing_enabled].pop
     end
   end
 
@@ -137,58 +161,61 @@ class Trace
     self.trace_context.payload.merge!(payload)
   end
 
-## Global context
+## thread-local context
   def self.trace_context=(t)
-    @@trace_context = t
+    Thread.current[:simple_trace_context] = t
   end
 
   def self.trace_context
-    @@trace_context
+    Thread.current[:simple_trace_context]
   end
 
   def self.root_id
-    @@root_id ||= self.new_id
+    Thread.current[:simple_trace_root_id]
   end
 
-  def self.epoch_for_monotonic(mono)
-    return nil unless mono && @@root_time_monotonic
-    @@root_time_wall + (mono - @@root_time_monotonic)
+  def self.tracing?
+    Thread.current[:simple_tracing_enabled] && Thread.current[:simple_tracing_enabled].last
   end
 
   def self.root_id=(id)
-    @@root_id = id
+    Thread.current[:simple_trace_root_id] = id
     #when we change roots, lets also update our walltime. within this root,
     #  we will fake walltime by adding the delta of the monotonic.
     #  this is more accurate for comparing durations within this procss and faster.
     @@root_time_wall = Time.now.to_f
     @@root_time_monotonic = AbsoluteTime.now
-    @@root_id
+    Thread.current[:simple_trace_root_id]
   end
 
+#Globally stateful
+  def self.epoch_for_monotonic(mono)
+    return nil unless mono && @@root_time_monotonic
+    @@root_time_wall + (mono - @@root_time_monotonic)
+  end
+
+  #global! Expected that this will be written once
   def self.service_name=(string)
     @@service_name = string
   end
   @@service_name = nil
 
+  #global! Expected that this will be written once
   def self.trace_complete=(proc)
     @@complete_handler = proc
   end
 
-# Turning tracing on and off
+  def self.hostname
+    @@hostname ||= (`hostname`.strip rescue 'unknwon-host')
+  end
+
+#Deprecated
   def self.enable_tracing!
-    @@tracing = true
+    raise "Unsupported. Use Trace.with_tracing do..end"
   end
 
   def self.disable_tracing!
-    @@tracing = false
-  end
-
-  def self.tracing?
-    @@tracing
-  end
-
-  def self.hostname
-    @@hostname ||= (`hostname`.strip rescue 'unknwon-host')
+    raise "Unsupported. Use Trace.without_tracing do..end"
   end
 end
 
