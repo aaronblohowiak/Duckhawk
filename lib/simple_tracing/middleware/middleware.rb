@@ -19,10 +19,10 @@ class Trace::Middleware
       end
     end
 
+    Trace.root_id = trace_id || Trace.new_id
+    headers['X-TRACE-ID'] = Trace.root_id
+    
     Trace.with_tracing do
-      Trace.root_id = trace_id || Trace.new_id
-      headers['X-TRACE-ID'] = Trace.root_id
-
       parent_id = env['HTTP_X_TRACE_PARENT_ID'] || request['trace_parent_id']
 
       puts "Tracing Enabled. #{Trace.root_id}::#{parent_id || "no-parent"} #{request.url} #{request.user_agent}"
