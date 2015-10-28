@@ -127,7 +127,7 @@
     </div>
 </div>
 
-<script type="text/javascript" src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.2.min.js"></script>
 <script>
     window.onhashchange = function(){
         console.log(window.location.hash)
@@ -368,6 +368,7 @@
     $.get('/data?id=' + window.location.hash.replace('#', ''), function(data){
       data = JSON.parse(data)
 
+      $data = data
       for (var i = data.length - 1; i >= 0; i--) {
         add(data[i], wrappers, root)
       };

@@ -1,3 +1,4 @@
+require 'open-uri'
 require 'webrick'
 require 'json'
 
@@ -19,7 +20,11 @@ end
 
 require 'net/http'
 def get_elasticsearch(id)
-  uri = URI.parse(ENV['ES_URL'])
+  begin
+    uri = URI.parse(ENV['ES_URL'])
+  rescue
+    return []
+  end
 
   body = JSON.dump({
     "query" => {
@@ -55,6 +60,19 @@ def get_elasticsearch(id)
   JSON.load(res.body)['hits']['hits'].map{|h| h['_source']}
 end
 
+def get_scalyr(id)
+  begin
+    raw = JSON.load(open(ENV['SCALYR_URL'] + URI.escape("$root_id = '"+id+"'")).read)
+    result = raw["matches"].map{|m| JSON.load(m["message"].match(/\{.*$/)[0].strip) }
+    puts result
+    return result
+  rescue => e
+    puts "Could not load from scalyr: #{e.message}"
+    return []
+  end
+end
+
+
 require 'json'
 
 require 'redis' rescue nil
@@ -71,7 +89,7 @@ server.mount "/", NonCachingFileHandler, File.dirname(__FILE__)+"/static"
 
 server.mount_proc '/data' do |req, res|
   id = req.query["id"]
-  res.body = JSON.dump(get_redis(id) + get_elasticsearch(id))
+  res.body = JSON.dump(get_redis(id) + get_elasticsearch(id)+ get_scalyr(id))
 end
 
 trap('INT') { server.stop }
