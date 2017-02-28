@@ -10,7 +10,7 @@ class NonCachingFileHandler < WEBrick::HTTPServlet::FileHandler
     res['Pragma']        = 'no-cache'
     res['Expires']       = Time.now - 100**4
   end
-  
+
   def do_GET(req, res)
     super
     prevent_caching(res)
@@ -60,11 +60,20 @@ def get_elasticsearch(id)
   JSON.load(res.body)['hits']['hits'].map{|h| h['_source']}
 end
 
-def get_scalyr(id)
+def get_scalyr(id, continuation_token = nil)
   begin
-    raw = JSON.load(open(ENV['SCALYR_URL'] + URI.escape("$root_id = '"+id+"'")).read)
+    uri = ENV['SCALYR_URL'] + URI.escape("$root_id = '"+id+"'")
+    uri += '&' + URI.escape("continuationToken=#{continuation_token}") if !continuation_token.nil?
+
+    raw = JSON.load(open(uri).read)
+
     result = raw["matches"].map{|m| JSON.load(m["message"].match(/\{.*$/)[0].strip) }
-    puts result
+    continuation_token = raw['continuationToken']
+
+    if raw['matches'].size > 0 && !continuation_token.nil?
+      result += get_scalyr(id, continuation_token)
+    end
+
     return result
   rescue => e
     puts "Could not load from scalyr: #{e.message}"
